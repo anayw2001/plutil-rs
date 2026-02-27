@@ -64,7 +64,7 @@ struct FlatObject<'a> {
 ///
 /// ```
 /// use std::io::Cursor;
-/// use plutil_rs::{parse, write, Value};
+/// use bplist::{parse, write, Value};
 ///
 /// let original = Value::Bool(true);
 /// let mut buf = Vec::new();

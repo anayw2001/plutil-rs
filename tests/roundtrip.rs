@@ -4,7 +4,7 @@
 
 use std::io::Cursor;
 
-use plutil_rs::{parse, write, Value};
+use bplist::{parse, write, Value};
 
 // ── Helper ─────────────────────────────────────────────────────────────────
 
@@ -436,7 +436,7 @@ fn output_accepted_by_plutil() {
     let mut buf = Vec::new();
     write(&v, &mut buf).unwrap();
 
-    let path = std::env::temp_dir().join("plutil_rs_interop_test.plist");
+    let path = std::env::temp_dir().join("bplist_interop_test.plist");
     fs::write(&path, &buf).unwrap();
 
     let output = Command::new("plutil")
@@ -475,8 +475,8 @@ fn parse_plutil_generated_plist() {
 </dict>
 </plist>"#;
 
-    let xml_path = std::env::temp_dir().join("plutil_rs_source.plist");
-    let bin_path = std::env::temp_dir().join("plutil_rs_binary.plist");
+    let xml_path = std::env::temp_dir().join("bplist_source.plist");
+    let bin_path = std::env::temp_dir().join("bplist_binary.plist");
 
     fs::write(&xml_path, xml).unwrap();
 

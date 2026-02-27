@@ -1,5 +1,5 @@
 [package]
-name = "plutil-rs"
+name = "bplist"
 version = "0.1.0"
 edition = "2024"
 

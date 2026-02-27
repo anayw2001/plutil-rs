@@ -1,7 +1,7 @@
 use std::fs;
 use std::process::Command;
 
-use plutil_rs::{write, Value};
+use bplist::{write, Value};
 
 fn main() {
     let plist = Value::Dictionary(vec![

@@ -160,7 +160,7 @@ struct ParseContext<'a, R: Read + Seek> {
 ///
 /// ```no_run
 /// use std::fs::File;
-/// use plutil_rs::parse;
+/// use bplist::parse;
 ///
 /// let mut f = File::open("Info.plist").unwrap();
 /// let value = parse(&mut f).unwrap();
@@ -170,7 +170,7 @@ struct ParseContext<'a, R: Read + Seek> {
 ///
 /// ```
 /// use std::io::Cursor;
-/// use plutil_rs::parse;
+/// use bplist::parse;
 ///
 /// # let bytes: Vec<u8> = vec![];
 /// let value = parse(&mut Cursor::new(bytes));
@@ -771,7 +771,7 @@ mod tests {
         let c = make_cursor(&[b"\x09"], 0); // true
         let bytes = c.get_ref().clone();
 
-        let path = std::env::temp_dir().join("plutil_rs_test.plist");
+        let path = std::env::temp_dir().join("bplist_test.plist");
         fs::write(&path, &bytes).unwrap();
 
         let mut f = fs::File::open(&path).unwrap();
