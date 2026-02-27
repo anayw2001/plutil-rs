@@ -1,0 +1,12 @@
+[package]
+name = "xplist"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+plist-types = { path = "../plist-types" }
+quick-xml    = "0.36"
+base64       = "0.22"
+
+[dev-dependencies]
+bplist = { path = "../bplist" }
