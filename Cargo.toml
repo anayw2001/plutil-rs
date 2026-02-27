@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "bplist",
+    "plist-types",
 ]
 resolver = "2"

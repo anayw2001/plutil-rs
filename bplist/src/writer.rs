@@ -19,7 +19,7 @@
 
 use std::io::{self, Write};
 
-use crate::Value;
+use plist_types::Value;
 
 // ── Public error type ──────────────────────────────────────────────────────
 

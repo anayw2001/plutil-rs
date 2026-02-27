@@ -57,7 +57,7 @@ use nom::{
     IResult,
 };
 
-use crate::Value;
+use plist_types::Value;
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
