@@ -1,3 +1,26 @@
+//! Shared property list value type.
+//!
+//! This crate defines [`Value`], the single enum that represents every data
+//! type found in Apple's property list formats.  It has no dependencies and
+//! is intended to be a stable, format-agnostic foundation that both
+//! `bplist` (binary plists) and `xplist` (XML plists) depend on.
+//!
+//! # Supported types
+//!
+//! | Variant | Description |
+//! |---|---|
+//! | [`Value::Null`] | Null singleton (rarely used) |
+//! | [`Value::Bool`] | Boolean |
+//! | [`Value::Integer`] | Signed 64-bit integer |
+//! | [`Value::Real`] | IEEE 754 double-precision float |
+//! | [`Value::Date`] | Seconds since the Apple epoch (2001-01-01 UTC) |
+//! | [`Value::Data`] | Raw binary data |
+//! | [`Value::String`] | UTF-8 string |
+//! | [`Value::Uid`] | Unsigned UID (used by `NSKeyedArchiver`) |
+//! | [`Value::Array`] | Ordered sequence of values |
+//! | [`Value::Set`] | Unordered set of values |
+//! | [`Value::Dictionary`] | Ordered list of key–value pairs |
+
 use std::fmt;
 
 /// A property list value.
