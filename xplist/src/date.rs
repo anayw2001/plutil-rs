@@ -99,6 +99,7 @@ pub fn apple_epoch_to_iso8601(seconds: f64) -> String {
 
 /// Parse an ISO 8601 string (`YYYY-MM-DDTHH:MM:SSZ` or `YYYY-MM-DDTHH:MM:SS`)
 /// into Apple-epoch seconds (f64).  Returns `Err(())` on parse failure.
+#[allow(clippy::result_unit_err)]
 pub fn iso8601_to_apple_epoch(s: &str) -> Result<f64, ()> {
     // Accept at minimum "YYYY-MM-DDTHH:MM:SS" (19 chars) with optional trailing 'Z'.
     let s = s.trim();

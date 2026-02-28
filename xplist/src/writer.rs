@@ -113,7 +113,7 @@ fn write_value<W: Write>(value: &Value, w: &mut W, indent: usize) -> Result<(), 
         Value::Array(items) => {
             write!(w, "{pad}<array>").map_err(WriteError::Io)?;
             for item in items {
-                write!(w, "\n").map_err(WriteError::Io)?;
+                writeln!(w).map_err(WriteError::Io)?;
                 write_value(item, w, indent + 1)?;
             }
             if !items.is_empty() {
@@ -132,7 +132,7 @@ fn write_value<W: Write>(value: &Value, w: &mut W, indent: usize) -> Result<(), 
                         write!(w, "{other}").map_err(WriteError::Io)?;
                     }
                 }
-                write!(w, "</key>\n").map_err(WriteError::Io)?;
+                writeln!(w, "</key>").map_err(WriteError::Io)?;
                 write_value(v, w, indent + 1)?;
             }
             if !pairs.is_empty() {

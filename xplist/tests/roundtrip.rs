@@ -86,7 +86,7 @@ fn real_pi() {
 
 #[test]
 fn real_negative() {
-    let v = Value::Real(-2.718);
+    let v = Value::Real(-1.5);
     assert_eq!(roundtrip(&v), v);
 }
 
@@ -300,7 +300,7 @@ fn plutil_accepts_our_output() {
             Value::String("data".into()),
             Value::Data(vec![1, 2, 3]),
         ),
-        (Value::String("score".into()), Value::Real(3.14)),
+        (Value::String("score".into()), Value::Real(1.5)),
         (Value::String("created".into()), Value::Date(0.0)),
     ]);
 

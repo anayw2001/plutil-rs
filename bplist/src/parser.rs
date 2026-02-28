@@ -589,9 +589,9 @@ mod tests {
     #[test]
     fn test_real_float64() {
         let mut obj = vec![0x23u8];
-        obj.extend_from_slice(&3.14f64.to_be_bytes());
+        obj.extend_from_slice(&1.23456789f64.to_be_bytes());
         match parse(&mut make_cursor(&[&obj], 0)).unwrap() {
-            Value::Real(v) => assert!((v - 3.14).abs() < 1e-10),
+            Value::Real(v) => assert!((v - 1.23456789).abs() < 1e-10),
             other => panic!("expected Real, got {other:?}"),
         }
     }

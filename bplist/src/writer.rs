@@ -332,7 +332,7 @@ fn uid_byte_count(val: u64) -> u8 {
         return 1;
     }
     let bits = 64 - val.leading_zeros(); // bits needed
-    ((bits + 7) / 8) as u8 // ceil(bits / 8)
+    bits.div_ceil(8) as u8
 }
 
 /// Minimum *power-of-2* byte count (1, 2, 4, or 8) needed to represent `val`

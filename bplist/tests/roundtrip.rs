@@ -108,12 +108,12 @@ fn roundtrip_real_exact() {
 
 #[test]
 fn roundtrip_real_inexact() {
-    // 3.14 is NOT exactly representable as f32; the writer always emits f64,
+    // 1.23 is NOT exactly representable as f32; the writer always emits f64,
     // so the full precision must survive the round-trip.
-    let v = Value::Real(3.14f64);
+    let v = Value::Real(1.23f64);
     let got = roundtrip(&v);
     if let Value::Real(f) = got {
-        assert!((f - 3.14f64).abs() < f64::EPSILON);
+        assert!((f - 1.23f64).abs() < f64::EPSILON);
     } else {
         panic!("expected Value::Real");
     }
