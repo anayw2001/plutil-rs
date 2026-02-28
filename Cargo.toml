@@ -2,6 +2,7 @@
 members = [
     "bplist",
     "plist-types",
+    "plutil",
     "xplist",
 ]
 resolver = "2"

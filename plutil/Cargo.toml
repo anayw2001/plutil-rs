@@ -1,0 +1,14 @@
+[package]
+name = "plutil"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "plutil"
+path = "src/main.rs"
+
+[dependencies]
+plist-types = { path = "../plist-types" }
+bplist      = { path = "../bplist" }
+xplist      = { path = "../xplist" }
+clap        = { version = "4", features = ["derive"] }
