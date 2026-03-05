@@ -2,6 +2,7 @@
 name = "xplist"
 version = "0.1.0"
 edition = "2024"
+license-file.workspace = true
 
 [dependencies]
 plist-types = { path = "../plist-types" }
