@@ -8,6 +8,7 @@ license-file.workspace = true
 plist-types = { path = "../plist-types" }
 quick-xml    = "0.36"
 base64       = "0.22"
+thiserror.workspace = true
 
 [dev-dependencies]
 bplist = { path = "../bplist" }

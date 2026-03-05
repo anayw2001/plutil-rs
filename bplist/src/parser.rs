@@ -52,9 +52,9 @@
 use std::io::{self, Read, Seek, SeekFrom};
 
 use nom::{
-    bytes::complete::take,
-    number::complete::{be_u64, be_u8},
     IResult,
+    bytes::complete::take,
+    number::complete::{be_u8, be_u64},
 };
 
 use plist_types::Value;
@@ -68,69 +68,45 @@ const MAX_DEPTH: usize = 256;
 
 // ── Public error type ──────────────────────────────────────────────────────
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum ParseError {
     /// The input is shorter than the minimum valid bplist.
+    #[error("file too short")]
     FileTooShort,
     /// The first 6 bytes are not `bplist`.
+    #[error("invalid magic bytes (expected 'bplist')")]
     InvalidMagic,
     /// The version field is not `00`.
+    #[error("unsupported bplist version (only '00' is supported)")]
     UnsupportedVersion,
     /// `offset_int_size` in the trailer is 0 or > 8.
+    #[error("invalid offset_int_size: {0} (must be 1–8)")]
     InvalidOffsetIntSize(u8),
     /// `object_ref_size` in the trailer is 0 or > 8.
+    #[error("invalid object_ref_size: {0} (must be 1–8)")]
     InvalidObjectRefSize(u8),
     /// An object reference or offset points outside the data.
+    #[error("object index {0} out of bounds")]
     IndexOutOfBounds(usize),
     /// A 0x5n object contained bytes that are not valid UTF-8.
+    #[error("invalid UTF-8 in ASCII string object")]
     InvalidUtf8,
     /// A 0x6n object contained code units that form invalid UTF-16.
+    #[error("invalid UTF-16 in Unicode string object")]
     InvalidUtf16,
     /// A marker byte with an unrecognised type tag was encountered.
+    #[error("unknown object marker: 0x{0:02X}")]
     UnknownType(u8),
     /// The nesting depth limit was reached (likely a malformed file).
+    #[error("maximum nesting depth (256) exceeded")]
     MaxDepthExceeded,
     /// A low-level nom parse error on a fixed-size structure (trailer or
     /// offset table).
+    #[error("parse error: {0}")]
     NomError(String),
     /// An I/O error from the underlying reader.
-    Io(io::Error),
-}
-
-impl std::fmt::Display for ParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ParseError::FileTooShort => write!(f, "file too short"),
-            ParseError::InvalidMagic => write!(f, "invalid magic bytes (expected 'bplist')"),
-            ParseError::UnsupportedVersion => {
-                write!(f, "unsupported bplist version (only '00' is supported)")
-            }
-            ParseError::InvalidOffsetIntSize(n) => {
-                write!(f, "invalid offset_int_size: {n} (must be 1–8)")
-            }
-            ParseError::InvalidObjectRefSize(n) => {
-                write!(f, "invalid object_ref_size: {n} (must be 1–8)")
-            }
-            ParseError::IndexOutOfBounds(i) => write!(f, "object index {i} out of bounds"),
-            ParseError::InvalidUtf8 => write!(f, "invalid UTF-8 in ASCII string object"),
-            ParseError::InvalidUtf16 => write!(f, "invalid UTF-16 in Unicode string object"),
-            ParseError::UnknownType(m) => write!(f, "unknown object marker: 0x{m:02X}"),
-            ParseError::MaxDepthExceeded => {
-                write!(f, "maximum nesting depth ({MAX_DEPTH}) exceeded")
-            }
-            ParseError::NomError(s) => write!(f, "parse error: {s}"),
-            ParseError::Io(e) => write!(f, "I/O error: {e}"),
-        }
-    }
-}
-
-impl std::error::Error for ParseError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            ParseError::Io(e) => Some(e),
-            _ => None,
-        }
-    }
+    #[error("I/O error: {0}")]
+    Io(#[source] io::Error),
 }
 
 // ── Internal structures ────────────────────────────────────────────────────
@@ -177,9 +153,7 @@ struct ParseContext<'a, R: Read + Seek> {
 /// ```
 pub fn parse<R: Read + Seek>(reader: &mut R) -> Result<Value, ParseError> {
     // 1. Determine file length; also validates the reader supports seeking.
-    let file_len = reader
-        .seek(SeekFrom::End(0))
-        .map_err(ParseError::Io)?;
+    let file_len = reader.seek(SeekFrom::End(0)).map_err(ParseError::Io)?;
     if file_len < (MAGIC.len() + TRAILER_SIZE) as u64 {
         return Err(ParseError::FileTooShort);
     }
@@ -203,8 +177,8 @@ pub fn parse<R: Read + Seek>(reader: &mut R) -> Result<Value, ParseError> {
     reader
         .read_exact(&mut trailer_buf)
         .map_err(ParseError::Io)?;
-    let (_, trailer) = parse_trailer(&trailer_buf)
-        .map_err(|e| ParseError::NomError(e.to_string()))?;
+    let (_, trailer) =
+        parse_trailer(&trailer_buf).map_err(|e| ParseError::NomError(e.to_string()))?;
 
     // 4. Sanity-check sizes from the trailer.
     if trailer.offset_int_size == 0 || trailer.offset_int_size > 8 {
@@ -365,9 +339,7 @@ fn parse_object_at<R: Read + Seek>(
         // ── UTF-16 BE string (2 bytes per character) ─────────────────────
         0x6 => {
             let char_count = read_count(ctx.reader, info)?;
-            let byte_count = char_count
-                .checked_mul(2)
-                .ok_or(ParseError::FileTooShort)?;
+            let byte_count = char_count.checked_mul(2).ok_or(ParseError::FileTooShort)?;
             let mut buf = vec![0u8; byte_count];
             ctx.reader.read_exact(&mut buf).map_err(ParseError::Io)?;
             let units: Vec<u16> = buf
@@ -469,7 +441,9 @@ fn read_refs<R: Read>(
     count: usize,
     ref_size: usize,
 ) -> Result<Vec<usize>, ParseError> {
-    let total = count.checked_mul(ref_size).ok_or(ParseError::FileTooShort)?;
+    let total = count
+        .checked_mul(ref_size)
+        .ok_or(ParseError::FileTooShort)?;
     let mut buf = vec![0u8; total];
     reader.read_exact(&mut buf).map_err(ParseError::Io)?;
     Ok(buf
@@ -712,10 +686,7 @@ mod tests {
         let mut c = make_cursor(&[b"\x51\x61", b"\x09", b"\xD1\x00\x01"], 2);
         assert_eq!(
             parse(&mut c).unwrap(),
-            Value::Dictionary(vec![(
-                Value::String("a".to_string()),
-                Value::Bool(true)
-            )])
+            Value::Dictionary(vec![(Value::String("a".to_string()), Value::Bool(true))])
         );
     }
 

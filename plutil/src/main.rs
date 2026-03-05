@@ -12,10 +12,9 @@
 //! | `--extract KEYPATH xml1\|binary1\|raw` | Extract the value at a key path |
 //! | `--type KEYPATH` | Print the type name of the value at a key path |
 
-use std::fmt;
+use std::fs;
 use std::io::{self, Cursor, Read, Write};
 use std::process;
-use std::fs;
 
 use clap::Parser;
 use plist_types::Value;
@@ -96,76 +95,32 @@ impl PlistFormat {
 
 // ── Error type ─────────────────────────────────────────────────────────────
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 enum PlutilError {
-    Io(io::Error),
-    BplistParse(bplist::ParseError),
-    BplistWrite(bplist::WriteError),
-    XplistParse(xplist::ParseError),
-    XplistWrite(xplist::WriteError),
+    #[error(transparent)]
+    Io(#[from] io::Error),
+    #[error(transparent)]
+    BplistParse(#[from] bplist::ParseError),
+    #[error(transparent)]
+    BplistWrite(#[from] bplist::WriteError),
+    #[error(transparent)]
+    XplistParse(#[from] xplist::ParseError),
+    #[error(transparent)]
+    XplistWrite(#[from] xplist::WriteError),
+    #[error("unknown format {0:?}; expected xml1 or binary1")]
     UnknownFormat(String),
+    #[error("keypath component {0:?} not found")]
     KeypathNotFound(String),
+    #[error("keypath component {component:?}: {msg}")]
     KeypathIndexError { component: String, msg: String },
+    #[error("cannot output {0} as 'raw'; use xml1 or binary1")]
     UnsupportedRaw(&'static str),
+    #[error("no operation specified; try -lint, -p, --convert, --extract, or --type")]
     NoOperation,
+    #[error("only one operation may be specified at a time")]
     MultipleOperations,
+    #[error("no input files specified")]
     NoInputFiles,
-}
-
-impl fmt::Display for PlutilError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            PlutilError::Io(e) => write!(f, "{e}"),
-            PlutilError::BplistParse(e) => write!(f, "{e}"),
-            PlutilError::BplistWrite(e) => write!(f, "{e}"),
-            PlutilError::XplistParse(e) => write!(f, "{e}"),
-            PlutilError::XplistWrite(e) => write!(f, "{e}"),
-            PlutilError::UnknownFormat(s) => {
-                write!(f, "unknown format {s:?}; expected xml1 or binary1")
-            }
-            PlutilError::KeypathNotFound(k) => write!(f, "keypath component {k:?} not found"),
-            PlutilError::KeypathIndexError { component, msg } => {
-                write!(f, "keypath component {component:?}: {msg}")
-            }
-            PlutilError::UnsupportedRaw(t) => {
-                write!(f, "cannot output {t} as 'raw'; use xml1 or binary1")
-            }
-            PlutilError::NoOperation => write!(
-                f,
-                "no operation specified; try -lint, -p, --convert, --extract, or --type"
-            ),
-            PlutilError::MultipleOperations => {
-                write!(f, "only one operation may be specified at a time")
-            }
-            PlutilError::NoInputFiles => write!(f, "no input files specified"),
-        }
-    }
-}
-
-impl From<io::Error> for PlutilError {
-    fn from(e: io::Error) -> Self {
-        Self::Io(e)
-    }
-}
-impl From<bplist::ParseError> for PlutilError {
-    fn from(e: bplist::ParseError) -> Self {
-        Self::BplistParse(e)
-    }
-}
-impl From<bplist::WriteError> for PlutilError {
-    fn from(e: bplist::WriteError) -> Self {
-        Self::BplistWrite(e)
-    }
-}
-impl From<xplist::ParseError> for PlutilError {
-    fn from(e: xplist::ParseError) -> Self {
-        Self::XplistParse(e)
-    }
-}
-impl From<xplist::WriteError> for PlutilError {
-    fn from(e: xplist::WriteError) -> Self {
-        Self::XplistWrite(e)
-    }
 }
 
 // ── I/O helpers ────────────────────────────────────────────────────────────
@@ -239,12 +194,12 @@ fn get_at_keypath<'a>(mut value: &'a Value, keypath: &str) -> Result<&'a Value, 
                 .map(|(_, v)| v)
                 .ok_or_else(|| PlutilError::KeypathNotFound(component.to_owned()))?,
             Value::Array(items) => {
-                let idx: usize = component.parse().map_err(|_| {
-                    PlutilError::KeypathIndexError {
+                let idx: usize = component
+                    .parse()
+                    .map_err(|_| PlutilError::KeypathIndexError {
                         component: component.to_owned(),
                         msg: "not a valid array index".to_owned(),
-                    }
-                })?;
+                    })?;
                 items
                     .get(idx)
                     .ok_or_else(|| PlutilError::KeypathNotFound(component.to_owned()))?

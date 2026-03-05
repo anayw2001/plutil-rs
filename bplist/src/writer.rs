@@ -23,26 +23,11 @@ use plist_types::Value;
 
 // ── Public error type ──────────────────────────────────────────────────────
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum WriteError {
     /// An I/O error from the underlying writer.
-    Io(io::Error),
-}
-
-impl std::fmt::Display for WriteError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            WriteError::Io(e) => write!(f, "I/O error: {e}"),
-        }
-    }
-}
-
-impl std::error::Error for WriteError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            WriteError::Io(e) => Some(e),
-        }
-    }
+    #[error("I/O error: {0}")]
+    Io(#[source] io::Error),
 }
 
 // ── Internal representation ────────────────────────────────────────────────
@@ -255,7 +240,11 @@ fn encode_object(buf: &mut Vec<u8>, obj: &FlatObject<'_>, obj_ref_size: u8) {
 
         // ── Array / Set ─────────────────────────────────────────────────
         Value::Array(_) | Value::Set(_) => {
-            let tag = if matches!(obj.value, Value::Array(_)) { 0xA } else { 0xC };
+            let tag = if matches!(obj.value, Value::Array(_)) {
+                0xA
+            } else {
+                0xC
+            };
             encode_count(buf, tag, obj.child_ids.len());
             for &id in &obj.child_ids {
                 append_be_uint(buf, id as u64, obj_ref_size as usize);

@@ -9,3 +9,6 @@ resolver = "2"
 
 [workspace.package]
 license-file = "LICENSE"
+
+[workspace.dependencies]
+thiserror = "2"

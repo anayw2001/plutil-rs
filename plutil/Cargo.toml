@@ -13,3 +13,4 @@ plist-types = { path = "../plist-types" }
 bplist      = { path = "../bplist" }
 xplist      = { path = "../xplist" }
 clap        = { version = "4", features = ["derive"] }
+thiserror.workspace = true

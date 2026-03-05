@@ -149,7 +149,11 @@ fn array_empty() {
 
 #[test]
 fn array_of_integers() {
-    let v = Value::Array(vec![Value::Integer(1), Value::Integer(2), Value::Integer(3)]);
+    let v = Value::Array(vec![
+        Value::Integer(1),
+        Value::Integer(2),
+        Value::Integer(3),
+    ]);
     assert_eq!(roundtrip(&v), v);
 }
 
@@ -171,10 +175,7 @@ fn dict_empty() {
 
 #[test]
 fn dict_single_pair() {
-    let v = Value::Dictionary(vec![(
-        Value::String("key".into()),
-        Value::Bool(true),
-    )]);
+    let v = Value::Dictionary(vec![(Value::String("key".into()), Value::Bool(true))]);
     assert_eq!(roundtrip(&v), v);
 }
 
@@ -200,12 +201,10 @@ fn nested_array_in_dict() {
 
 #[test]
 fn nested_dict_in_array() {
-    let v = Value::Array(vec![
-        Value::Dictionary(vec![(
-            Value::String("a".into()),
-            Value::String("b".into()),
-        )]),
-    ]);
+    let v = Value::Array(vec![Value::Dictionary(vec![(
+        Value::String("a".into()),
+        Value::String("b".into()),
+    )])]);
     assert_eq!(roundtrip(&v), v);
 }
 
@@ -286,20 +285,17 @@ fn output_has_doctype() {
 #[cfg(target_os = "macos")]
 #[test]
 fn plutil_accepts_our_output() {
-    use std::process::{Command, Stdio};
     use std::io::Write as _;
+    use std::process::{Command, Stdio};
 
     let v = Value::Dictionary(vec![
-        (Value::String("name".into()), Value::String("plutil-rs".into())),
+        (
+            Value::String("name".into()),
+            Value::String("plutil-rs".into()),
+        ),
         (Value::String("version".into()), Value::Integer(1)),
-        (
-            Value::String("enabled".into()),
-            Value::Bool(true),
-        ),
-        (
-            Value::String("data".into()),
-            Value::Data(vec![1, 2, 3]),
-        ),
+        (Value::String("enabled".into()), Value::Bool(true)),
+        (Value::String("data".into()), Value::Data(vec![1, 2, 3])),
         (Value::String("score".into()), Value::Real(1.5)),
         (Value::String("created".into()), Value::Date(0.0)),
     ]);
@@ -333,12 +329,15 @@ fn plutil_accepts_our_output() {
 #[cfg(target_os = "macos")]
 #[test]
 fn parse_plutil_generated_xml() {
-    use std::process::Command;
     use std::io::Write as _;
+    use std::process::Command;
 
     // Build a binary plist in memory.
     let original = Value::Dictionary(vec![
-        (Value::String("greeting".into()), Value::String("hello".into())),
+        (
+            Value::String("greeting".into()),
+            Value::String("hello".into()),
+        ),
         (Value::String("count".into()), Value::Integer(42)),
         (Value::String("flag".into()), Value::Bool(false)),
     ]);
@@ -356,12 +355,7 @@ fn parse_plutil_generated_xml() {
         .spawn()
         .expect("failed to spawn plutil");
 
-    child
-        .stdin
-        .take()
-        .unwrap()
-        .write_all(&bplist_buf)
-        .unwrap();
+    child.stdin.take().unwrap().write_all(&bplist_buf).unwrap();
     let output = child.wait_with_output().unwrap();
     assert!(
         output.status.success(),

@@ -5,10 +5,7 @@
 use std::io::{BufRead, BufReader, Read};
 
 use base64::Engine as _;
-use quick_xml::{
-    Reader,
-    events::Event,
-};
+use quick_xml::{Reader, events::Event};
 
 use plist_types::Value;
 
@@ -18,57 +15,35 @@ const MAX_DEPTH: usize = 256;
 
 // ── Public error type ──────────────────────────────────────────────────────
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum ParseError {
     /// An underlying XML parse error.
-    Xml(quick_xml::Error),
+    #[error("XML error: {0}")]
+    Xml(#[from] quick_xml::Error),
     /// No `<plist>` root element was found.
+    #[error("missing <plist> root element")]
     MissingPlistRoot,
     /// An unknown element tag was encountered inside the plist.
+    #[error("unexpected tag: <{0}>")]
     UnexpectedTag(String),
     /// A structural XML issue (e.g. text where an element was expected).
+    #[error("unexpected XML event")]
     UnexpectedEvent,
     /// Could not parse `<integer>` text content.
+    #[error("invalid integer: {0:?}")]
     InvalidInteger(String),
     /// Could not parse `<real>` text content.
+    #[error("invalid real: {0:?}")]
     InvalidReal(String),
     /// Could not base64-decode `<data>` text content.
+    #[error("invalid base64: {0:?}")]
     InvalidBase64(String),
     /// Could not parse `<date>` text content as ISO 8601.
+    #[error("invalid date: {0:?}")]
     InvalidDate(String),
     /// Nesting depth exceeded the limit.
+    #[error("maximum nesting depth exceeded")]
     MaxDepthExceeded,
-}
-
-impl std::fmt::Display for ParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ParseError::Xml(e) => write!(f, "XML error: {e}"),
-            ParseError::MissingPlistRoot => write!(f, "missing <plist> root element"),
-            ParseError::UnexpectedTag(t) => write!(f, "unexpected tag: <{t}>"),
-            ParseError::UnexpectedEvent => write!(f, "unexpected XML event"),
-            ParseError::InvalidInteger(s) => write!(f, "invalid integer: {s:?}"),
-            ParseError::InvalidReal(s) => write!(f, "invalid real: {s:?}"),
-            ParseError::InvalidBase64(s) => write!(f, "invalid base64: {s:?}"),
-            ParseError::InvalidDate(s) => write!(f, "invalid date: {s:?}"),
-            ParseError::MaxDepthExceeded => write!(f, "maximum nesting depth exceeded"),
-        }
-    }
-}
-
-impl std::error::Error for ParseError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            ParseError::Xml(e) => Some(e),
-            _ => None,
-        }
-    }
-}
-
-impl From<quick_xml::Error> for ParseError {
-    fn from(e: quick_xml::Error) -> Self {
-        ParseError::Xml(e)
-    }
 }
 
 // ── Public entry point ─────────────────────────────────────────────────────
@@ -95,7 +70,10 @@ fn parse_bufread<B: BufRead>(buf_reader: B) -> Result<Value, ParseError> {
     // Advance to the <plist> start element, skipping declaration / DOCTYPE.
     loop {
         buf.clear();
-        match xml_reader.read_event_into(&mut buf).map_err(ParseError::Xml)? {
+        match xml_reader
+            .read_event_into(&mut buf)
+            .map_err(ParseError::Xml)?
+        {
             Event::Start(ref e) if e.name().as_ref() == b"plist" => break,
             Event::Eof => return Err(ParseError::MissingPlistRoot),
             // Skip <?xml ...?>, <!DOCTYPE ...>, comments, whitespace, etc.
@@ -109,7 +87,10 @@ fn parse_bufread<B: BufRead>(buf_reader: B) -> Result<Value, ParseError> {
     // Consume </plist> (best-effort; ignore EOF).
     loop {
         buf.clear();
-        match xml_reader.read_event_into(&mut buf).map_err(ParseError::Xml)? {
+        match xml_reader
+            .read_event_into(&mut buf)
+            .map_err(ParseError::Xml)?
+        {
             Event::End(ref e) if e.name().as_ref() == b"plist" => break,
             Event::Eof => break,
             _ => {}

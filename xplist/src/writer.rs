@@ -12,32 +12,14 @@ use crate::date::apple_epoch_to_iso8601;
 
 // ── Public error type ──────────────────────────────────────────────────────
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum WriteError {
     /// An I/O error from the underlying writer.
-    Io(io::Error),
+    #[error("I/O error: {0}")]
+    Io(#[source] io::Error),
     /// A `Value` variant that cannot be represented in XML plist format.
+    #[error("unsupported value type for XML plist: {0}")]
     UnsupportedType(&'static str),
-}
-
-impl std::fmt::Display for WriteError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            WriteError::Io(e) => write!(f, "I/O error: {e}"),
-            WriteError::UnsupportedType(t) => {
-                write!(f, "unsupported value type for XML plist: {t}")
-            }
-        }
-    }
-}
-
-impl std::error::Error for WriteError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            WriteError::Io(e) => Some(e),
-            _ => None,
-        }
-    }
 }
 
 // ── Public entry point ─────────────────────────────────────────────────────

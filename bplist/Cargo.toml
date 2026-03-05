@@ -7,3 +7,4 @@ license-file.workspace = true
 [dependencies]
 nom = "7"
 plist-types = { path = "../plist-types" }
+thiserror.workspace = true

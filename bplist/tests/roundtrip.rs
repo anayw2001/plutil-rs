@@ -4,7 +4,7 @@
 
 use std::io::Cursor;
 
-use bplist::{parse, write, Value};
+use bplist::{Value, parse, write};
 
 // ── Helper ─────────────────────────────────────────────────────────────────
 
@@ -319,10 +319,7 @@ fn roundtrip_dict_empty() {
 
 #[test]
 fn roundtrip_dict_single_pair() {
-    let v = Value::Dictionary(vec![(
-        Value::String("enabled".into()),
-        Value::Bool(true),
-    )]);
+    let v = Value::Dictionary(vec![(Value::String("enabled".into()), Value::Bool(true))]);
     assert_eq!(roundtrip(&v), v);
 }
 
@@ -340,17 +337,18 @@ fn roundtrip_dict_multiple_pairs() {
 fn roundtrip_dict_nested_array() {
     let v = Value::Dictionary(vec![(
         Value::String("items".into()),
-        Value::Array(vec![Value::Integer(1), Value::Integer(2), Value::Integer(3)]),
+        Value::Array(vec![
+            Value::Integer(1),
+            Value::Integer(2),
+            Value::Integer(3),
+        ]),
     )]);
     assert_eq!(roundtrip(&v), v);
 }
 
 #[test]
 fn roundtrip_dict_nested_dict() {
-    let inner = Value::Dictionary(vec![(
-        Value::String("x".into()),
-        Value::Integer(99),
-    )]);
+    let inner = Value::Dictionary(vec![(Value::String("x".into()), Value::Integer(99))]);
     let outer = Value::Dictionary(vec![(Value::String("inner".into()), inner)]);
     assert_eq!(roundtrip(&outer), outer);
 }
@@ -425,7 +423,10 @@ fn output_accepted_by_plutil() {
     use std::process::Command;
 
     let v = Value::Dictionary(vec![
-        (Value::String("name".into()), Value::String("plutil-rs".into())),
+        (
+            Value::String("name".into()),
+            Value::String("plutil-rs".into()),
+        ),
         (Value::String("version".into()), Value::Integer(1)),
         (
             Value::String("flags".into()),
