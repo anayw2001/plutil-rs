@@ -63,7 +63,7 @@ name = "binplist"
 version = "0.1.0"
 dependencies = [
  "nom",
- "plist-types",
+ "plist-types 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
 ]
 
@@ -158,12 +158,18 @@ name = "plist-types"
 version = "0.1.0"
 
 [[package]]
+name = "plist-types"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5f40921297c5b24c8bf61edb5ec0334e5db787ddbcdbea6fa1b5bb4461ba808"
+
+[[package]]
 name = "plutil"
 version = "0.1.0"
 dependencies = [
  "binplist",
  "clap",
- "plist-types",
+ "plist-types 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
  "xplist",
 ]
@@ -265,7 +271,7 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "binplist",
- "plist-types",
+ "plist-types 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "quick-xml",
  "thiserror",
 ]
