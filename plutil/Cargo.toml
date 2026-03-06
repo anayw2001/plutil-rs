@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 license.workspace = true
 repository.workspace = true
+description = "A library implementing a subset of Apple's plutil binary functionality using the xplist and bplist crates"
 
 [[bin]]
 name = "plutil"
