@@ -8,7 +8,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-license-file = "LICENSE"
+license = "Apache-2.0"
 repository = "https://github.com/anayw2001/plutil-rs"
 
 [workspace.dependencies]
