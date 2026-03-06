@@ -100,9 +100,9 @@ enum PlutilError {
     #[error(transparent)]
     Io(#[from] io::Error),
     #[error(transparent)]
-    BplistParse(#[from] bplist::ParseError),
+    BplistParse(#[from] binplist::ParseError),
     #[error(transparent)]
-    BplistWrite(#[from] bplist::WriteError),
+    BplistWrite(#[from] binplist::WriteError),
     #[error(transparent)]
     XplistParse(#[from] xplist::ParseError),
     #[error(transparent)]
@@ -159,7 +159,7 @@ fn write_output(
 
 fn parse_plist(bytes: &[u8]) -> Result<Value, PlutilError> {
     match PlistFormat::detect(bytes) {
-        PlistFormat::Binary => Ok(bplist::parse(&mut Cursor::new(bytes))?),
+        PlistFormat::Binary => Ok(binplist::parse(&mut Cursor::new(bytes))?),
         PlistFormat::Xml => {
             let mut r: &[u8] = bytes;
             Ok(xplist::parse(&mut r)?)
@@ -170,7 +170,7 @@ fn parse_plist(bytes: &[u8]) -> Result<Value, PlutilError> {
 fn serialize_plist(value: &Value, fmt: PlistFormat) -> Result<Vec<u8>, PlutilError> {
     let mut buf = Vec::new();
     match fmt {
-        PlistFormat::Binary => bplist::write(value, &mut buf)?,
+        PlistFormat::Binary => binplist::write(value, &mut buf)?,
         PlistFormat::Xml => xplist::write(value, &mut buf)?,
     }
     Ok(buf)

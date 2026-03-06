@@ -1,7 +1,7 @@
 use std::fs;
 use std::process::Command;
 
-use bplist::{Value, write};
+use binplist::{Value, write};
 
 fn main() {
     let plist = Value::Dictionary(vec![

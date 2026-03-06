@@ -4,7 +4,7 @@
 
 use std::io::Cursor;
 
-use bplist::{Value, parse, write};
+use binplist::{Value, parse, write};
 
 // ── Helper ─────────────────────────────────────────────────────────────────
 

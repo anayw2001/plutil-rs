@@ -343,7 +343,7 @@ fn parse_plutil_generated_xml() {
     ]);
 
     let mut bplist_buf = Vec::new();
-    bplist::write(&original, &mut bplist_buf).expect("bplist write failed");
+    binplist::write(&original, &mut bplist_buf).expect("bplist write failed");
 
     // Ask plutil to convert it to XML1.
     use std::process::Stdio;

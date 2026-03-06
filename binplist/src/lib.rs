@@ -8,7 +8,7 @@
 //!
 //! ```
 //! use std::io::Cursor;
-//! use bplist::{parse, write, Value};
+//! use binplist::{parse, write, Value};
 //!
 //! let original = Value::Dictionary(vec![
 //!     (Value::String("answer".into()), Value::Integer(42)),

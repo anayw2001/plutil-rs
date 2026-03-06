@@ -3,7 +3,7 @@
 //! This crate defines [`Value`], the single enum that represents every data
 //! type found in Apple's property list formats.  It has no dependencies and
 //! is intended to be a stable, format-agnostic foundation that both
-//! `bplist` (binary plists) and `xplist` (XML plists) depend on.
+//! `binplist` (binary plists) and `xplist` (XML plists) depend on.
 //!
 //! # Supported types
 //!

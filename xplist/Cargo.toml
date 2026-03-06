@@ -13,4 +13,4 @@ base64       = "0.22"
 thiserror.workspace = true
 
 [dev-dependencies]
-bplist = { path = "../bplist" }
+binplist = { path = "../binplist" }

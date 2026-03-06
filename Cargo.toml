@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "bplist",
+    "binplist",
     "plist-types",
     "plutil",
     "xplist",

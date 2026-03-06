@@ -136,7 +136,7 @@ struct ParseContext<'a, R: Read + Seek> {
 ///
 /// ```no_run
 /// use std::fs::File;
-/// use bplist::parse;
+/// use binplist::parse;
 ///
 /// let mut f = File::open("Info.plist").unwrap();
 /// let value = parse(&mut f).unwrap();
@@ -146,7 +146,7 @@ struct ParseContext<'a, R: Read + Seek> {
 ///
 /// ```
 /// use std::io::Cursor;
-/// use bplist::parse;
+/// use binplist::parse;
 ///
 /// # let bytes: Vec<u8> = vec![];
 /// let value = parse(&mut Cursor::new(bytes));

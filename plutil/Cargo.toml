@@ -12,7 +12,7 @@ path = "src/main.rs"
 
 [dependencies]
 plist-types = { path = "../plist-types" }
-bplist      = { path = "../bplist" }
+binplist    = { path = "../binplist" }
 xplist      = { path = "../xplist" }
 clap        = { version = "4", features = ["derive"] }
 thiserror.workspace = true
