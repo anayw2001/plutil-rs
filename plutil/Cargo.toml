@@ -11,7 +11,7 @@ name = "plutil"
 path = "src/main.rs"
 
 [dependencies]
-plist-types = { path = "../plist-types" }
+plist-types = "0.1.0"
 binplist    = { path = "../binplist" }
 xplist      = { path = "../xplist" }
 clap        = { version = "4", features = ["derive"] }

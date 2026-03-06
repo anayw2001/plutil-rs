@@ -8,5 +8,5 @@ description = "A dependency-light binary property list serializer and deserializ
 
 [dependencies]
 nom = "7"
-plist-types = { path = "../plist-types" }
+plist-types = "0.1.0"
 thiserror.workspace = true

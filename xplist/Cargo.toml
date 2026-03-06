@@ -7,7 +7,7 @@ repository.workspace = true
 description = "An XML-based property list serializer and deserializer"
 
 [dependencies]
-plist-types = { path = "../plist-types" }
+plist-types = "0.1.0"
 quick-xml    = "0.36"
 base64       = "0.22"
 thiserror.workspace = true
