@@ -9,6 +9,7 @@ resolver = "2"
 
 [workspace.package]
 license-file = "LICENSE"
+repository = "https://github.com/anayw2001/plutil-rs"
 
 [workspace.dependencies]
 thiserror = "2"
