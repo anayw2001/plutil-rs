@@ -7,6 +7,6 @@ repository.workspace = true
 description = "A dependency-light binary property list serializer and deserializer"
 
 [dependencies]
-nom = "7"
+nom = "8"
 plist-types = { path = "../plist-types" }
 thiserror.workspace = true
