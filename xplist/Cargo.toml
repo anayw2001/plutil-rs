@@ -9,7 +9,7 @@ description = "An XML-based property list serializer and deserializer"
 [dependencies]
 plist-types = { path = "../plist-types" }
 quick-xml    = "0.36"
-base64       = "0.22"
+base64       = "0.23"
 thiserror.workspace = true
 
 [dev-dependencies]
